@@ -1899,6 +1899,38 @@
     border: 0;
     display: block;
   }
+  /* Loader shown over the stage until the embedded form/viewer fires `load`.
+     Sits above the (blank) iframe and fades out once content is ready. */
+  .arv__loader {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    background: #f5f6f8;
+    color: #9a9a9a;
+    font-size: 14px;
+    font-weight: 500;
+    transition: opacity 0.3s ease;
+  }
+  .arv__stage.is-loaded .arv__loader {
+    opacity: 0;
+    pointer-events: none;
+  }
+  .arv__spinner {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: 3px solid rgba(0, 0, 0, 0.1);
+    border-top-color: var(--blue);
+    animation: arvSpin 0.7s linear infinite;
+  }
+  @keyframes arvSpin {
+    to { transform: rotate(360deg); }
+  }
 
   /* ================================================================== */
   /* CAROUSEL FULL-BLEED (mobile)                                        */
@@ -3839,14 +3871,17 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
       </button>
     </div>
-    <div class="arv__stage">
+    <div class="arv__stage" id="quizStage">
+      <div class="arv__loader" id="quizLoader">
+        <div class="arv__spinner"></div>
+        <span>Loading your quiz…</span>
+      </div>
       <iframe
         class="arv__frame"
         id="quizFrame"
         title="Ergonomic Assistance quiz"
         allow="camera; microphone; autoplay; encrypted-media; fullscreen"
         allowfullscreen
-        loading="lazy"
       ></iframe>
     </div>
   </div>
@@ -4994,11 +5029,29 @@
        running in the background. The <a href> stays as a no-JS fallback. */
     var quizModal = document.getElementById("quizModal");
     var quizFrame = document.getElementById("quizFrame");
+    var quizStage = document.getElementById("quizStage");
     var QUIZ_URL = "https://form.typeform.com/to/bsHaWHcD";
+
+    // Start fetching the Typeform the moment the user shows intent (hover /
+    // touch / focus on the button) so it's already loading before the click
+    // lands. The spinner covers whatever load time is left.
+    function warmQuiz() {
+      if (!quizFrame || quizFrame.getAttribute("src") === QUIZ_URL) return;
+      if (quizStage) quizStage.classList.remove("is-loaded");
+      quizFrame.setAttribute("src", QUIZ_URL);
+    }
+
+    if (quizFrame) {
+      quizFrame.addEventListener("load", function () {
+        // Ignore the initial blank load; only react once a real src is set.
+        if (quizFrame.getAttribute("src") !== QUIZ_URL) return;
+        if (quizStage) quizStage.classList.add("is-loaded");
+      });
+    }
 
     function openQuiz() {
       if (!quizModal || !quizFrame) return;
-      if (quizFrame.getAttribute("src") !== QUIZ_URL) quizFrame.setAttribute("src", QUIZ_URL);
+      warmQuiz(); // no-op if already warmed by an intent event
       quizModal.classList.add("is-open");
       quizModal.setAttribute("aria-hidden", "false");
       document.body.style.overflow = "hidden";
@@ -5008,6 +5061,7 @@
       quizModal.classList.remove("is-open");
       quizModal.setAttribute("aria-hidden", "true");
       if (quizFrame) quizFrame.removeAttribute("src"); // stop the form running while hidden
+      if (quizStage) quizStage.classList.remove("is-loaded"); // reset loader for next open
       document.body.style.overflow = "";
     }
 
@@ -5017,12 +5071,27 @@
           e.preventDefault();
           openQuiz();
         });
+        // Passive intent listeners so they never block scrolling/tapping.
+        ["pointerenter", "touchstart", "focus"].forEach(function (evt) {
+          el.addEventListener(evt, warmQuiz, { passive: true });
+        });
       });
       quizModal.querySelectorAll("[data-quiz-close]").forEach(function (el) {
         el.addEventListener("click", closeQuiz);
       });
       document.addEventListener("keydown", function (e) {
         if (e.key === "Escape" && quizModal.classList.contains("is-open")) closeQuiz();
+      });
+
+      // Warm the DNS/TLS handshake to Typeform up front (cheap, and a big win on
+      // the first open). Injected at runtime so no <link> lands in the static
+      // HTML — keeps the Replo custom-code validator happy.
+      ["https://form.typeform.com", "https://embed.typeform.com"].forEach(function (h) {
+        var l = document.createElement("link");
+        l.rel = "preconnect";
+        l.href = h;
+        l.crossOrigin = "";
+        document.head.appendChild(l);
       });
     }
 
