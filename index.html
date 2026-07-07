@@ -66,9 +66,7 @@
   /* HEADER / NAV                                                        */
   /* ================================================================== */
   .site-header {
-    position: sticky;
-    top: 0;
-    z-index: 50;
+    position: static; /* normal in-flow section (was sticky; Replo skipped it) */
     background: #fff;
     border-bottom: 1px solid var(--border-2);
   }
@@ -2920,11 +2918,11 @@
 
 <!-- ===================== HEADER ===================== -->
 <div class="site-header">
-  <nav class="nav" aria-label="Primary">
+  <div class="nav" role="navigation" aria-label="Primary">
     <a class="nav__logo" href="#" aria-label="Frido home">
       <img src="https://cdn.shopify.com/s/files/1/0553/0419/2034/files/Frido_Logo_1.png?v=1778930844&width=160" alt="Frido" width="120" height="30" loading="eager" fetchpriority="high" decoding="async" />
     </a>
-  </nav>
+  </div>
 </div>
 
 <!-- ===================== HERO ===================== -->
@@ -3484,7 +3482,7 @@
   Shopify CDN. Social icons and the back-to-top chevron are inlined as SVG
   (in the source they are local .svg / .png assets, not CDN-hosted).
 -->
-<footer class="site-footer">
+<div class="site-footer" role="contentinfo">
   <!-- ── Mobile layout ── -->
   <div class="site-footer__mobile">
     <div class="site-footer__mobile-top">
@@ -3599,7 +3597,7 @@
       </div>
     </div>
   </div>
-</footer>
+</div>
 
 <!-- ===================== STICKY CTA (mobile) ===================== -->
 <div class="sticky-cta" id="stickyCta">
