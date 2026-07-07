@@ -1956,7 +1956,7 @@
   /* ================================================================== */
   @media (min-width: 1024px) {
     body {
-      padding-bottom: 0; /* no sticky bar on desktop */
+      padding-bottom: var(--sticky-cta-h); /* reserve space for the desktop sticky CTA */
     }
 
     /* nav */
@@ -2072,9 +2072,15 @@
       border-radius: 32px;
     }
 
-    /* hide sticky bar on desktop */
+    /* desktop: keep the sticky bar, but centre the button at a sane width
+       (a full-width button across a wide screen looks off) */
     .sticky-cta {
-      display: none;
+      display: block;
+      padding: 14px 20px;
+    }
+    .sticky-cta .cta-btn {
+      max-width: 439px;
+      margin: 0 auto;
     }
   }
 
