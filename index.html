@@ -1410,32 +1410,10 @@
     padding: 46px 16px 12px;
     transition: opacity 0.2s ease;
   }
-  /* While a new colour's image is fetching, dim the current one and show a
-     spinner so the tap gets instant feedback (image swaps can lag 1–2s). */
+  /* While a new colour's image is fetching, dim the current one so the tap
+     gets instant feedback (image swaps can lag 1-2s). */
   .pc__media.is-loading > img {
     opacity: 0.35;
-  }
-  .pc__media::after {
-    content: "";
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 26px;
-    height: 26px;
-    margin: -13px 0 0 -13px;
-    border: 3px solid rgba(0, 0, 0, 0.12);
-    border-top-color: var(--blue);
-    border-radius: 50%;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.2s ease;
-  }
-  .pc__media.is-loading::after {
-    opacity: 1;
-    animation: pcSpin 0.7s linear infinite;
-  }
-  @keyframes pcSpin {
-    to { transform: rotate(360deg); }
   }
   .pc__badge {
     position: absolute;
@@ -1659,6 +1637,12 @@
     height: 100%;
     object-fit: cover; /* fill the square container (was contain + padding) */
     padding: 0;
+    transition: opacity 0.2s ease;
+  }
+  /* Dim the gallery while a new colour's images are fetching (same instant
+     feedback as the product cards; opacity only, no spinner). */
+  .pdp__slides.is-loading .pdp__slideimg {
+    opacity: 0.4;
   }
   /* Single-image products (most desks) read better as one full-width landscape
      card than a lone square floating on the left. Keep the natural image size
@@ -1947,17 +1931,6 @@
   .arv__stage.is-loaded .arv__loader {
     opacity: 0;
     pointer-events: none;
-  }
-  .arv__spinner {
-    width: 38px;
-    height: 38px;
-    border-radius: 50%;
-    border: 3px solid rgba(0, 0, 0, 0.1);
-    border-top-color: var(--blue);
-    animation: arvSpin 0.7s linear infinite;
-  }
-  @keyframes arvSpin {
-    to { transform: rotate(360deg); }
   }
 
   /* ================================================================== */
@@ -3901,7 +3874,6 @@
     </div>
     <div class="arv__stage" id="quizStage">
       <div class="arv__loader" id="quizLoader">
-        <div class="arv__spinner"></div>
         <span>Loading your quiz...</span>
       </div>
       <iframe
@@ -4872,16 +4844,25 @@
 
       // Slide 1 — the lead image (or a labelled placeholder when there's none).
       if (imgs[0]) {
+        // Dim the gallery until the new lead image paints (instant feedback on
+        // colour change; the extra slides fade in as they load).
+        pdpSlides.classList.add("is-loading");
+        var clearPdpLoading = function () { pdpSlides.classList.remove("is-loading"); };
+        pdpMainImg.onload = clearPdpLoading;
+        pdpMainImg.onerror = clearPdpLoading;
         pdpMainImg.src = imgSrc(imgs[0]);
         pdpMainImg.alt = alt;
         pdpMainImg.style.display = "";
         pdpMainImg.style.transform = imgRot(imgs[0]) ? "rotate(" + imgRot(imgs[0]) + "deg)" : "";
         pdpMainPh.style.display = "none";
+        if (pdpMainImg.complete && pdpMainImg.naturalWidth) clearPdpLoading();
+        else setTimeout(clearPdpLoading, 4000);
       } else {
         pdpMainImg.removeAttribute("src");
         pdpMainImg.style.display = "none";
         pdpMainImg.style.transform = "";
         pdpMainPh.style.display = "";
+        pdpSlides.classList.remove("is-loading"); // nothing to load → no dim
       }
 
       // Slides 2..N — rebuild the remaining gallery images for this variant.
