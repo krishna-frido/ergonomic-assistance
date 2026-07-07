@@ -66,7 +66,9 @@
   /* HEADER / NAV                                                        */
   /* ================================================================== */
   .site-header {
-    position: static; /* normal in-flow section (was sticky; Replo skipped it) */
+    position: sticky;
+    top: 0;
+    z-index: 50; /* above page content, below the modals (why 80 / pdp 95 / arv 110) */
     background: #fff;
     border-bottom: 1px solid var(--border-2);
   }
