@@ -1408,6 +1408,34 @@
     height: 100%;
     object-fit: contain;
     padding: 46px 16px 12px;
+    transition: opacity 0.2s ease;
+  }
+  /* While a new colour's image is fetching, dim the current one and show a
+     spinner so the tap gets instant feedback (image swaps can lag 1–2s). */
+  .pc__media.is-loading > img {
+    opacity: 0.35;
+  }
+  .pc__media::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 26px;
+    height: 26px;
+    margin: -13px 0 0 -13px;
+    border: 3px solid rgba(0, 0, 0, 0.12);
+    border-top-color: var(--blue);
+    border-radius: 50%;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+  }
+  .pc__media.is-loading::after {
+    opacity: 1;
+    animation: pcSpin 0.7s linear infinite;
+  }
+  @keyframes pcSpin {
+    to { transform: rotate(360deg); }
   }
   .pc__badge {
     position: absolute;
@@ -4927,9 +4955,17 @@
         var ph = mediaEl.querySelector(".img-ph");
         if (v.img) {
           if (img) {
+            // Instant tap feedback: dim + spinner until the new image paints.
+            mediaEl.classList.add("is-loading");
+            var clearLoading = function () { mediaEl.classList.remove("is-loading"); };
+            img.onload = clearLoading;
+            img.onerror = clearLoading;
             img.src = imgSrc(v.img);
             img.alt = p.name;
             img.style.transform = imgRot(v.img) ? "rotate(" + imgRot(v.img) + "deg)" : "";
+            // Cached image → load may not fire; safety timeout avoids a stuck spinner.
+            if (img.complete && img.naturalWidth) clearLoading();
+            else setTimeout(clearLoading, 4000);
           } else if (ph) {
             ph.outerHTML = '<img src="' + imgSrc(v.img) + '" alt="' + esc(p.name) + '" loading="lazy"' + imgStyleAttr(v.img) + ' />';
           }
@@ -4958,6 +4994,24 @@
         var activeSw = card.querySelector(".pc__swatch.is-active");
         var vi = activeSw ? parseInt(activeSw.getAttribute("data-vi"), 10) || 0 : 0;
         openPdp(card.getAttribute("data-cat"), parseInt(card.getAttribute("data-i"), 10), vi);
+      });
+
+      // Warm a variant's image into cache on swatch hover so the click swap is
+      // near-instant. pointerover bubbles (unlike pointerenter) for delegation.
+      var swatchPreloaded = {};
+      catalogTrack.addEventListener("pointerover", function (e) {
+        var sw = e.target.closest(".pc__swatch");
+        if (!sw) return;
+        var card = sw.closest(".pc");
+        if (!card) return;
+        var p = catBy(card.getAttribute("data-cat")).items[parseInt(card.getAttribute("data-i"), 10)];
+        if (!p) return;
+        var v = variantsOf(p)[parseInt(sw.getAttribute("data-vi"), 10) || 0];
+        if (!v || !v.img) return;
+        var url = imgSrc(v.img);
+        if (swatchPreloaded[url]) return;
+        swatchPreloaded[url] = true;
+        new Image().src = url;
       });
     }
     if (pdpModal) {
