@@ -3913,7 +3913,10 @@
       function pageCount() {
         var max = maxScroll();
         if (max <= 1) return 1;
-        return Math.max(1, Math.ceil(max / step()) + 1);
+        // Round (not ceil) so sub-pixel rounding of scrollWidth/clientWidth
+        // doesn't inflate the count — e.g. 2 full-width slides must read as
+        // 2 pages, not 3. Consistent with activeIndex()'s Math.round.
+        return Math.max(1, Math.round(max / step()) + 1);
       }
       function activeIndex(pages) {
         var max = maxScroll();
