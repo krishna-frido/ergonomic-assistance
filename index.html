@@ -1,7 +1,36 @@
+<!-- ------------------------------------------------------------------ -->
+<!-- Resource hints — warm up the sockets for the origins this page hits  -->
+<!-- so images, video, fonts and the quiz don't each pay a cold          -->
+<!-- DNS+TLS handshake. Safe in an embed; the host page provides <head>. -->
+<!-- ------------------------------------------------------------------ -->
+<link rel="preconnect" href="https://cdn.shopify.com" crossorigin />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="preconnect" href="https://form.typeform.com" />
+<link rel="dns-prefetch" href="https://cdn.shopify.com" />
+<link rel="dns-prefetch" href="https://form.typeform.com" />
+
+<!-- Fonts loaded off the critical path via the preload-swap pattern: the
+     browser fetches the CSS without blocking first paint, then flips it to a
+     stylesheet on load. display=swap keeps text visible in fallback fonts and
+     swaps when the webfonts arrive. <noscript> keeps it working without JS. -->
+<link
+  rel="preload"
+  as="style"
+  href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz@1,6..96&family=DM+Sans:wght@400;500&family=Outfit:wght@300;400;500;600&display=swap"
+  onload="this.onload=null;this.rel='stylesheet'"
+/>
+<noscript>
+  <link
+    rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz@1,6..96&family=DM+Sans:wght@400;500&family=Outfit:wght@300;400;500;600&display=swap"
+  />
+</noscript>
+
 <style>
-  /* Fonts loaded via @import so no head-level tags are needed in this embed.
-     The host Shopify/Replo page already provides the viewport and favicon. */
-  @import url("https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz@1,6..96&family=DM+Sans:wght@400;500&family=Outfit:wght@300;400;500;600&display=swap");
+  /* Fonts are loaded via the <link> above (faster than an @import, which the
+     browser can only discover after parsing this stylesheet). The host
+     Shopify/Replo page already provides the viewport and favicon. */
 
   /* ------------------------------------------------------------------ */
   /* Design tokens                                                       */
@@ -1408,6 +1437,30 @@
     height: 100%;
     object-fit: contain;
     padding: 46px 16px 12px;
+    transition: opacity 0.2s ease;
+  }
+  /* Optimistic colour-swap feedback: while a tapped variant's image is still
+     loading, gently dim the current image and sweep a shimmer over the media so
+     the tap is acknowledged instantly. Cleared on the new image's load event.
+     Only ever visible transiently during a user-initiated swap. */
+  .pc__media.is-loading > img {
+    opacity: 0.55;
+  }
+  .pc__media.is-loading::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(100deg, transparent 30%, rgba(255, 255, 255, 0.55) 50%, transparent 70%);
+    background-size: 200% 100%;
+    animation: pcShimmer 0.9s ease-in-out infinite;
+    pointer-events: none;
+  }
+  @keyframes pcShimmer {
+    from { background-position: 180% 0; }
+    to { background-position: -80% 0; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .pc__media.is-loading::after { animation: none; }
   }
   .pc__badge {
     position: absolute;
@@ -2970,24 +3023,23 @@
     <!-- RIGHT (media): hero video -->
     <div class="hero__media">
       <!--
-        🎬 HERO VIDEO — swap the src below for your CDN link.
-        Loads WITHOUT JavaScript (Replo/embed-safe). The inline SVG `poster`
-        shows until the first frame is ready, so it never flashes black even if
-        the CDN is slow or blocked, or if scripts are stripped.
+        🎬 HERO VIDEO — swap the CDN link in data-src below.
+        LCP-optimised: the `poster` is a tiny (~1.6KB) inline blur of the real
+        first frame, so the hero paints INSTANTLY with zero network. The actual
+        video is held in `data-src` (not src) with preload="none" and is loaded
+        by JS just after first paint, so it never competes with the hero for
+        bandwidth. The blur is replaced the moment the video has a frame.
       -->
       <video
         class="hero__video"
         id="heroVideo"
-        autoplay
         muted
         loop
         playsinline
-        preload="metadata"
-        poster="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='800'%20height='800'%3E%3Crect%20width='800'%20height='800'%20fill='%23efeeec'/%3E%3Ccircle%20cx='400'%20cy='400'%20r='52'%20fill='%23ffffff'/%3E%3Cpath%20d='M387%20374%20l34%2026%20-34%2026%20z'%20fill='%23101820'/%3E%3C/svg%3E"
-      >
-        <!-- 👇 PASTE_CDN_VIDEO_URL: replace this src with your own CDN link -->
-        <source src="https://cdn.shopify.com/videos/c/o/v/1da0280b45fe4ccb93fd28d37540f406.mp4" type="video/mp4" />
-      </video>
+        preload="none"
+        data-src="https://cdn.shopify.com/videos/c/o/v/1da0280b45fe4ccb93fd28d37540f406.mp4"
+        poster="data:image/jpeg;base64,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"
+      ></video>
     </div>
   </section>
 
@@ -2999,7 +3051,7 @@
       <!-- Review 1 -->
       <article class="review">
         <div class="review__media">
-          <img src="https://cdn.shopify.com/s/files/1/0553/0419/2034/files/Frame_2147239230_copy_2.png?v=1783353916" alt="Aditi's ergonomic setup" loading="lazy" />
+          <img src="https://cdn.shopify.com/s/files/1/0553/0419/2034/files/Frame_2147239230_copy_2.png?v=1783353916" alt="Aditi's ergonomic setup" loading="lazy" decoding="async" />
         </div>
         <div class="review__body">
           <span class="stars" aria-label="5 out of 5 stars">
@@ -3020,7 +3072,7 @@
       <!-- Review 2 -->
       <article class="review">
         <div class="review__media">
-          <img src="https://cdn.shopify.com/s/files/1/0553/0419/2034/files/Frame_2147239230_copy.png?v=1783353916" alt="Rahul's ergonomic setup" loading="lazy" />
+          <img src="https://cdn.shopify.com/s/files/1/0553/0419/2034/files/Frame_2147239230_copy.png?v=1783353916" alt="Rahul's ergonomic setup" loading="lazy" decoding="async" />
         </div>
         <div class="review__body">
           <span class="stars" aria-label="5 out of 5 stars">
@@ -3041,7 +3093,7 @@
       <!-- Review 3 -->
       <article class="review">
         <div class="review__media">
-          <img src="https://cdn.shopify.com/s/files/1/0553/0419/2034/files/Frame_2147239230.png?v=1783353917" alt="Tanya's ergonomic setup" loading="lazy" />
+          <img src="https://cdn.shopify.com/s/files/1/0553/0419/2034/files/Frame_2147239230.png?v=1783353917" alt="Tanya's ergonomic setup" loading="lazy" decoding="async" />
         </div>
         <div class="review__body">
           <span class="stars" aria-label="5 out of 5 stars">
@@ -3062,7 +3114,7 @@
       <!-- Review 4 -->
       <article class="review">
         <div class="review__media">
-          <img src="https://cdn.shopify.com/s/files/1/0553/0419/2034/files/Frame_2147239230_e7f2eb74-f63c-4b36-a004-1384ada8c981.png?v=1783436334" alt="Customer ergonomic setup" loading="lazy" />
+          <img src="https://cdn.shopify.com/s/files/1/0553/0419/2034/files/Frame_2147239230_e7f2eb74-f63c-4b36-a004-1384ada8c981.png?v=1783436334" alt="Customer ergonomic setup" loading="lazy" decoding="async" />
         </div>
         <div class="review__body">
           <span class="stars" aria-label="5 out of 5 stars">
@@ -3083,7 +3135,7 @@
       <!-- Review 5 -->
       <article class="review">
         <div class="review__media">
-          <img src="https://cdn.shopify.com/s/files/1/0553/0419/2034/files/Frame_2147239230_copy_2.png?v=1783353916" alt="Customer ergonomic setup" loading="lazy" />
+          <img src="https://cdn.shopify.com/s/files/1/0553/0419/2034/files/Frame_2147239230_copy_2.png?v=1783353916" alt="Customer ergonomic setup" loading="lazy" decoding="async" />
         </div>
         <div class="review__body">
           <span class="stars" aria-label="5 out of 5 stars">
@@ -3104,7 +3156,7 @@
       <!-- Review 6 -->
       <article class="review">
         <div class="review__media">
-          <img src="https://cdn.shopify.com/s/files/1/0553/0419/2034/files/review6.png?v=1783438606" alt="Customer ergonomic setup" loading="lazy" />
+          <img src="https://cdn.shopify.com/s/files/1/0553/0419/2034/files/review6.png?v=1783438606" alt="Customer ergonomic setup" loading="lazy" decoding="async" />
         </div>
         <div class="review__body">
           <span class="stars" aria-label="5 out of 5 stars">
@@ -3125,7 +3177,7 @@
       <!-- Review 7 -->
       <article class="review">
         <div class="review__media">
-          <img src="https://cdn.shopify.com/s/files/1/0553/0419/2034/files/review5.png?v=1783435440" alt="Customer ergonomic setup" loading="lazy" />
+          <img src="https://cdn.shopify.com/s/files/1/0553/0419/2034/files/review5.png?v=1783435440" alt="Customer ergonomic setup" loading="lazy" decoding="async" />
         </div>
         <div class="review__body">
           <span class="stars" aria-label="5 out of 5 stars">
@@ -3249,12 +3301,12 @@
     </div>
 
     <div class="wc__track" id="wcTrack">
-      <img class="wc__card" src="https://cdn.shopify.com/s/files/1/0553/0419/2034/files/ergonomic_assistance_Card_A.png?v=1783354182" alt="35 Ls+ Customers trust Frido with Comfort & Ergonomics" loading="lazy" />
-      <img class="wc__card" src="https://cdn.shopify.com/s/files/1/0553/0419/2034/files/ergonomic_assistance_Card_B.png?v=1783354183" alt="Leading Ergonomic products across various categories" loading="lazy" />
-      <img class="wc__card" src="https://cdn.shopify.com/s/files/1/0553/0419/2034/files/ergonomic_assistance_Card_C.png?v=1783354182" alt="18+ Experience Stores across 5 cities and expanding" loading="lazy" />
-      <img class="wc__card" src="https://cdn.shopify.com/s/files/1/0553/0419/2034/files/ergonomic_assistance_Card_D.png?v=1783354173" alt="60,000+ Ergonomic spaces upgraded for better comfort" loading="lazy" />
-      <img class="wc__card" src="https://cdn.shopify.com/s/files/1/0553/0419/2034/files/ergonomic_assistance_Card_E.png?v=1783354184" alt="100% Real Human support, no bots, no scripts, just people" loading="lazy" />
-      <img class="wc__card" src="https://cdn.shopify.com/s/files/1/0553/0419/2034/files/ergonomic_assistance_Card_F.png?v=1783354183" alt="BIFMA Certified Chairs to meet the highest international standards" loading="lazy" />
+      <img class="wc__card" src="https://cdn.shopify.com/s/files/1/0553/0419/2034/files/ergonomic_assistance_Card_A.png?v=1783354182" alt="35 Ls+ Customers trust Frido with Comfort & Ergonomics" loading="lazy" decoding="async" />
+      <img class="wc__card" src="https://cdn.shopify.com/s/files/1/0553/0419/2034/files/ergonomic_assistance_Card_B.png?v=1783354183" alt="Leading Ergonomic products across various categories" loading="lazy" decoding="async" />
+      <img class="wc__card" src="https://cdn.shopify.com/s/files/1/0553/0419/2034/files/ergonomic_assistance_Card_C.png?v=1783354182" alt="18+ Experience Stores across 5 cities and expanding" loading="lazy" decoding="async" />
+      <img class="wc__card" src="https://cdn.shopify.com/s/files/1/0553/0419/2034/files/ergonomic_assistance_Card_D.png?v=1783354173" alt="60,000+ Ergonomic spaces upgraded for better comfort" loading="lazy" decoding="async" />
+      <img class="wc__card" src="https://cdn.shopify.com/s/files/1/0553/0419/2034/files/ergonomic_assistance_Card_E.png?v=1783354184" alt="100% Real Human support, no bots, no scripts, just people" loading="lazy" decoding="async" />
+      <img class="wc__card" src="https://cdn.shopify.com/s/files/1/0553/0419/2034/files/ergonomic_assistance_Card_F.png?v=1783354183" alt="BIFMA Certified Chairs to meet the highest international standards" loading="lazy" decoding="async" />
     </div>
 
     <div class="wc__controls">
@@ -3304,12 +3356,12 @@
     </div>
 
     <div class="gallery__grid">
-      <img class="g-a" src="https://cdn.shopify.com/s/files/1/0553/0419/2034/files/image_75.png?v=1783355826" alt="Ergonomic workspace setup" loading="lazy" />
-      <img class="g-b" src="https://cdn.shopify.com/s/files/1/0553/0419/2034/files/IMG_0838_1.png?v=1783355828" alt="Ergonomic chair by the window" loading="lazy" />
-      <img class="g-c" src="https://cdn.shopify.com/s/files/1/0553/0419/2034/files/image_359.png?v=1783355826" alt="Wooden desk with dual monitors" loading="lazy" />
-      <img class="g-d" src="https://cdn.shopify.com/s/files/1/0553/0419/2034/files/magnific__replace-the-dual-monitors-with-single-and-put-that__6091_1.png?v=1783355827" alt="Corner gaming desk setup" loading="lazy" />
-      <img class="g-e" src="https://cdn.shopify.com/s/files/1/0553/0419/2034/files/image_358.png?v=1783355826" alt="White desk with monitor arm" loading="lazy" />
-      <img class="g-f" src="https://cdn.shopify.com/s/files/1/0553/0419/2034/files/magnific_put-monitor-on-montor-arm_KjCnbCnkqp_1.png?v=1783355826" alt="Desk with monitor on an arm" loading="lazy" />
+      <img class="g-a" src="https://cdn.shopify.com/s/files/1/0553/0419/2034/files/image_75.png?v=1783355826" alt="Ergonomic workspace setup" loading="lazy" decoding="async" />
+      <img class="g-b" src="https://cdn.shopify.com/s/files/1/0553/0419/2034/files/IMG_0838_1.png?v=1783355828" alt="Ergonomic chair by the window" loading="lazy" decoding="async" />
+      <img class="g-c" src="https://cdn.shopify.com/s/files/1/0553/0419/2034/files/image_359.png?v=1783355826" alt="Wooden desk with dual monitors" loading="lazy" decoding="async" />
+      <img class="g-d" src="https://cdn.shopify.com/s/files/1/0553/0419/2034/files/magnific__replace-the-dual-monitors-with-single-and-put-that__6091_1.png?v=1783355827" alt="Corner gaming desk setup" loading="lazy" decoding="async" />
+      <img class="g-e" src="https://cdn.shopify.com/s/files/1/0553/0419/2034/files/image_358.png?v=1783355826" alt="White desk with monitor arm" loading="lazy" decoding="async" />
+      <img class="g-f" src="https://cdn.shopify.com/s/files/1/0553/0419/2034/files/magnific_put-monitor-on-montor-arm_KjCnbCnkqp_1.png?v=1783355826" alt="Desk with monitor on an arm" loading="lazy" decoding="async" />
     </div>
   </section>
 
@@ -3856,8 +3908,36 @@
   (function () {
     "use strict";
 
-    /* NOTE: the hero video now loads on its own via the <source src> + poster,
-       so nothing here is required for it to render. JS below is enhancement only. */
+    /* ------------------------------------------------------------------ */
+    /* Perf helper: run work AFTER first paint, off the critical path.      */
+    /* requestIdleCallback when available; otherwise a post-load timeout.   */
+    /* Used to defer the hero video and all below-the-fold init so they     */
+    /* don't block LCP or hog the main thread while the page is painting.   */
+    /* ------------------------------------------------------------------ */
+    var whenIdle = (function () {
+      var ric = window.requestIdleCallback;
+      if (ric) return function (fn) { ric(fn, { timeout: 2000 }); };
+      return function (fn) {
+        if (document.readyState === "complete") setTimeout(fn, 1);
+        else window.addEventListener("load", function () { setTimeout(fn, 1); });
+      };
+    })();
+
+    /* ---- Hero video: paint the inline blur poster instantly, then load the
+       real video just after first paint so it never competes for the LCP.
+       preload="none" + data-src keeps the network idle until we say go. */
+    (function initHeroVideo() {
+      var hv = document.getElementById("heroVideo");
+      if (!hv) return;
+      var src = hv.getAttribute("data-src");
+      if (!src) return;
+      whenIdle(function () {
+        hv.src = src;                 // begins the download only now
+        hv.load();
+        var pr = hv.play();
+        if (pr && pr.catch) pr.catch(function () {}); // ignore autoplay rejections
+      });
+    })();
 
     /* ---- "See why you need it" pop-up ----
        Mobile: bottom sheet that rises from behind the always-visible sticky CTA.
@@ -3912,8 +3992,16 @@
       }
       function pageCount() {
         var max = maxScroll();
-        if (max <= 1) return 1;
-        return Math.max(1, Math.ceil(max / step()) + 1);
+        var s = step();
+        if (max <= 1 || s <= 0) return 1;
+        // Steps needed to reach the end, made robust to sub-pixel rounding:
+        // step() is measured with fractional pixels while maxScroll() uses
+        // integer scrollWidth/clientWidth, so a ratio of e.g. 1.001 must count
+        // as ONE step (2 dots), not round up to a phantom extra page (3 dots).
+        var raw = max / s;
+        var steps = Math.round(raw);
+        if (raw - steps > 0.15) steps += 1; // a real partial step past the last full one
+        return Math.max(1, steps + 1);
       }
       function activeIndex(pages) {
         var max = maxScroll();
@@ -3974,12 +4062,16 @@
       return { render: renderDots };
     }
 
-    [
-      ["testiTrack", ".testimonials__controls"],
-      ["howTrack", ".how__controls"],
-      ["wcTrack", ".wc__controls"]
-    ].forEach(function (cfg) {
-      setupCarousel(document.getElementById(cfg[0]), document.querySelector(cfg[1]));
+    // Below-the-fold carousels — set up after first paint so their layout
+    // reads (getBoundingClientRect etc.) don't thrash the main thread on load.
+    whenIdle(function () {
+      [
+        ["testiTrack", ".testimonials__controls"],
+        ["howTrack", ".how__controls"],
+        ["wcTrack", ".wc__controls"]
+      ].forEach(function (cfg) {
+        setupCarousel(document.getElementById(cfg[0]), document.querySelector(cfg[1]));
+      });
     });
 
     /* ================================================================
@@ -4675,20 +4767,25 @@
     }
 
     if (catalogTabs && catalogTrack) {
-      renderTabs();
-      renderCards(activeCat);
-      catalogCarousel = setupCarousel(catalogTrack, document.querySelector(".catalog__controls"));
+      // Build the (below-the-fold) product catalog after first paint. The
+      // catalogTrack hover/touch/click listeners are delegated on the container
+      // (wired separately below), so they keep working for cards added here.
+      whenIdle(function () {
+        renderTabs();
+        renderCards(activeCat);
+        catalogCarousel = setupCarousel(catalogTrack, document.querySelector(".catalog__controls"));
 
-      catalogTabs.addEventListener("click", function (e) {
-        var btn = e.target.closest(".cat-tab");
-        if (!btn) return;
-        var key = btn.getAttribute("data-cat");
-        if (key === activeCat) return;
-        activeCat = key;
-        setActiveTab(key);
-        renderCards(key);
-        catalogTrack.scrollLeft = 0;
-        if (catalogCarousel) catalogCarousel.render();
+        catalogTabs.addEventListener("click", function (e) {
+          var btn = e.target.closest(".cat-tab");
+          if (!btn) return;
+          var key = btn.getAttribute("data-cat");
+          if (key === activeCat) return;
+          activeCat = key;
+          setActiveTab(key);
+          renderCards(key);
+          catalogTrack.scrollLeft = 0;
+          if (catalogCarousel) catalogCarousel.render();
+        });
       });
     }
 
@@ -4723,7 +4820,7 @@
         ? '<img src="' + imgSrc(p.img) + '" alt="' + esc(name) + '" loading="lazy"' + imgStyleAttr(p.img) + " />"
         : phBox(name);
       return '<article class="rev">' +
-          '<video class="rev__video" src="' + r.video + '" muted loop autoplay playsinline webkit-playsinline preload="metadata"></video>' +
+          '<video class="rev__video" data-src="' + r.video + '" muted loop playsinline webkit-playsinline preload="none"></video>' +
           '<button class="rev__sound is-muted" type="button" aria-label="Turn on sound">' + SND_MUTED + SND_ON + "</button>" +
           '<button class="rev__product" type="button" data-cat="' + esc(r.cat) + '" data-i="' + r.i +
             '" aria-label="View ' + esc(name) + '">' +
@@ -4734,13 +4831,27 @@
     }
 
     var reviewsTrack = document.getElementById("reviewsTrack");
-    if (reviewsTrack) {
+    // Reels are below the fold and the single heaviest load-time cost (6 videos
+    // + innerHTML). Build them after first paint so they never block the hero;
+    // the look-ahead observer below still buffers each reel before it's reached.
+    if (reviewsTrack) whenIdle(function () {
       reviewsTrack.innerHTML = REVIEWS.map(reviewHTML).join("");
       setupCarousel(reviewsTrack, document.querySelector(".reviews__controls"));
 
       var revVideos = Array.prototype.slice.call(reviewsTrack.querySelectorAll(".rev__video"));
 
+      // Attach the real source only when a reel is near the viewport (set below
+      // via a look-ahead observer), so all 6 reels don't fetch at page load.
+      function revLoad(v) {
+        if (!v || v.__loaded) return;
+        var ds = v.getAttribute("data-src");
+        if (!ds) return;
+        v.__loaded = true;
+        v.src = ds;
+        v.load();
+      }
       function revPlay(v) {
+        revLoad(v); // make sure the source is attached before asking it to play
         var pr = v.play();
         if (pr && pr.catch) pr.catch(function () {});
       }
@@ -4777,17 +4888,27 @@
         setReviewSound(card, v ? v.muted : true);
       });
 
-      // Autoplay hygiene: pause reels while the section is scrolled off-screen.
       if ("IntersectionObserver" in window) {
+        // Look-ahead loader: attach each reel's source ~400px before it scrolls
+        // into view so it's buffered and plays instantly. Loads once, then stops.
+        var revLoadIO = new IntersectionObserver(function (entries) {
+          entries.forEach(function (en) {
+            if (en.isIntersecting) { revLoad(en.target); revLoadIO.unobserve(en.target); }
+          });
+        }, { rootMargin: "400px 0px" });
+        // Autoplay hygiene: play only while actually on screen, pause off-screen.
         var revIO = new IntersectionObserver(function (entries) {
           entries.forEach(function (en) {
             if (en.isIntersecting) revPlay(en.target);
             else { en.target.pause(); if (!en.target.muted) revMute(en.target); }
           });
         }, { threshold: 0.2 });
-        revVideos.forEach(function (v) { revIO.observe(v); });
+        revVideos.forEach(function (v) { revLoadIO.observe(v); revIO.observe(v); });
+      } else {
+        // No IntersectionObserver: fall back to loading + playing them directly.
+        revVideos.forEach(revPlay);
       }
-    }
+    });
 
     /* ---- Mini PDP ---- */
     var pdpModal = document.getElementById("pdpModal");
@@ -4901,12 +5022,23 @@
         var img = mediaEl.querySelector("img");
         var ph = mediaEl.querySelector(".img-ph");
         if (v.img) {
+          var newSrc = imgSrc(v.img);
+          if (!img && ph) {
+            ph.outerHTML = '<img src="' + newSrc + '" alt="' + esc(p.name) + '" loading="lazy"' + imgStyleAttr(v.img) + ' />';
+            img = mediaEl.querySelector("img");
+          }
           if (img) {
-            img.src = imgSrc(v.img);
+            // Optimistic feedback: acknowledge the tap immediately, then clear
+            // once the new image is ready. warmCardVariants() usually has it
+            // cached already, in which case img.complete is true → no flash.
+            mediaEl.classList.add("is-loading");
+            var clearLoading = function () { mediaEl.classList.remove("is-loading"); };
+            img.onload = clearLoading;
+            img.onerror = clearLoading;
+            if (img.getAttribute("src") !== newSrc) img.src = newSrc;
             img.alt = p.name;
             img.style.transform = imgRot(v.img) ? "rotate(" + imgRot(v.img) + "deg)" : "";
-          } else if (ph) {
-            ph.outerHTML = '<img src="' + imgSrc(v.img) + '" alt="' + esc(p.name) + '" loading="lazy"' + imgStyleAttr(v.img) + ' />';
+            if (img.complete) clearLoading(); // already cached/decoded
           }
         } else if (img) {
           img.outerHTML = phBox(p.name);
@@ -4917,7 +5049,28 @@
       });
     }
 
+    /* Preload a card's colour-variant images the moment the user shows intent
+       (hover on desktop, first touch / keyboard focus on mobile) so tapping a
+       swatch swaps the picture instantly, instead of firing a cold CDN fetch
+       at click time and leaving the old colour on screen while it downloads.
+       Same width (800) the swap uses, so it's a warm cache hit. Runs once. */
+    function warmCardVariants(card) {
+      if (!card || card.__variantsWarmed) return;
+      card.__variantsWarmed = true;
+      var p = catBy(card.getAttribute("data-cat")).items[parseInt(card.getAttribute("data-i"), 10)];
+      if (!p) return;
+      variantsOf(p).forEach(function (v) {
+        if (v && v.img) { var im = new Image(); im.src = imgSrc(v.img); }
+      });
+    }
+
     if (catalogTrack) {
+      ["pointerover", "touchstart", "focusin"].forEach(function (evt) {
+        catalogTrack.addEventListener(evt, function (e) {
+          var card = e.target.closest(".pc");
+          if (card) warmCardVariants(card);
+        }, { passive: true });
+      });
       catalogTrack.addEventListener("click", function (e) {
         var card = e.target.closest(".pc");
         if (!card) return;
@@ -5006,9 +5159,20 @@
     var quizFrame = document.getElementById("quizFrame");
     var QUIZ_URL = "https://form.typeform.com/to/bsHaWHcD";
 
+    /* Start loading the Typeform the moment the user shows intent (hover on
+       desktop, touchstart on mobile — both fire a beat before the click) so the
+       form is already booting by the time the modal opens, instead of loading
+       cold while the user waits. Fires at most once. */
+    var quizWarmed = false;
+    function warmQuiz() {
+      if (quizWarmed || !quizFrame) return;
+      quizWarmed = true;
+      if (quizFrame.getAttribute("src") !== QUIZ_URL) quizFrame.setAttribute("src", QUIZ_URL);
+    }
+
     function openQuiz() {
       if (!quizModal || !quizFrame) return;
-      if (quizFrame.getAttribute("src") !== QUIZ_URL) quizFrame.setAttribute("src", QUIZ_URL);
+      warmQuiz();
       quizModal.classList.add("is-open");
       quizModal.setAttribute("aria-hidden", "false");
       document.body.style.overflow = "hidden";
@@ -5018,6 +5182,7 @@
       quizModal.classList.remove("is-open");
       quizModal.setAttribute("aria-hidden", "true");
       if (quizFrame) quizFrame.removeAttribute("src"); // stop the form running while hidden
+      quizWarmed = false; // allow the next intent to warm it up again
       document.body.style.overflow = "";
     }
 
@@ -5027,6 +5192,10 @@
           e.preventDefault();
           openQuiz();
         });
+        // Preload on intent, before the click fires.
+        el.addEventListener("pointerenter", warmQuiz);
+        el.addEventListener("touchstart", warmQuiz, { passive: true });
+        el.addEventListener("focus", warmQuiz);
       });
       quizModal.querySelectorAll("[data-quiz-close]").forEach(function (el) {
         el.addEventListener("click", closeQuiz);
@@ -5040,7 +5209,9 @@
        Native <details> toggles instantly; here we animate height + fade on
        open/close and manage single-open exclusivity in JS (so the closing
        item can animate out instead of being snapped shut by the browser). */
-    (function initFaqAccordion() {
+    // Deferred: the FAQ is far below the fold and native <details> already
+    // toggles without JS, so wiring the animated version after paint is safe.
+    whenIdle(function initFaqAccordion() {
       var items = Array.prototype.slice.call(document.querySelectorAll(".faq__item"));
       if (!items.length) return;
       var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -5108,7 +5279,7 @@
           }
         });
       });
-    })();
+    });
 
     /* ---- Footer "back to top" ---- */
     document.querySelectorAll('[data-back-to-top]').forEach(function (btn) {
