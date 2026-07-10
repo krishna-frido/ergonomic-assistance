@@ -1,3 +1,8 @@
+<!-- Mobile layout viewport. Kept here (not only on the host page) so the page
+     also renders correctly when opened standalone; a duplicate on the host is
+     harmless since both declare width=device-width. -->
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
 <!-- ------------------------------------------------------------------ -->
 <!-- Resource hints — warm up the sockets for the origins this page hits  -->
 <!-- so images, video, fonts and the quiz don't each pay a cold          -->
@@ -30,7 +35,7 @@
 <style>
   /* Fonts are loaded via the <link> above (faster than an @import, which the
      browser can only discover after parsing this stylesheet). The host
-     Shopify/Replo page already provides the viewport and favicon. */
+     Shopify/Replo page already provides the favicon. */
 
   /* ------------------------------------------------------------------ */
   /* Design tokens                                                       */
@@ -362,7 +367,6 @@
     justify-content: center;
     width: 56px;
     background: var(--yellow);
-    box-shadow: inset 1px 0 0 rgba(0, 0, 0, 0.05);
   }
   .cta-btn__arrow svg {
     width: 22px;
@@ -379,6 +383,10 @@
     background: #fff;
     border-top: 1px solid var(--border-2);
     padding: 16px 20px calc(16px + env(safe-area-inset-bottom, 0px));
+  }
+  /* progressive-glass panel is desktop-only; mobile keeps the solid white bar */
+  .sticky-cta__glass {
+    display: none;
   }
 
   /* ================================================================== */
@@ -919,16 +927,27 @@
   .how-card {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    gap: 32px;
-    padding: 36px 24px;
+    gap: 22px;
+    padding: 28px 24px;
     border-radius: 16px;
     background: #f7f7f7;
-    text-align: center;
+  }
+  .how-card__num {
+    margin: 0;
+    font-size: 26px;
+    font-weight: 500;
+    line-height: 1;
+    color: #d4d4d4;
+  }
+  .how-card__body {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    min-width: 0;
   }
   .how-card__icon {
-    width: 40px;
-    height: 40px;
+    width: 52px;
+    height: 52px;
     flex-shrink: 0;
   }
   .how-card__icon svg {
@@ -938,28 +957,27 @@
   .how-card__text {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 8px;
+    min-width: 0;
   }
-  .how-card__step {
-    margin: 0;
-    font-size: 16px;
-    font-weight: 500;
-    color: #a7a7a7;
+  .how-card__title,
+  .how-card__desc {
+    overflow-wrap: break-word;
   }
   .how-card__title {
     margin: 0;
-    font-size: 22px;
+    font-size: 20px;
     font-weight: 500;
     color: #000;
   }
   .how-card__desc {
     margin: 0;
-    font-size: 18px;
-    line-height: 1.3;
-    color: var(--muted);
+    font-size: 16px;
+    line-height: 1.4;
+    color: #7e7e7e;
   }
   .how__controls {
-    display: none; /* dots + arrows are desktop-only (mobile stacks all cards) */
+    display: none; /* no carousel controls — steps are a static list */
   }
 
   /* ================================================================== */
@@ -1541,6 +1559,13 @@
     border-radius: 999px;
     box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.06);
   }
+  /* dark swatches read a touch small (irradiation illusion) — grow the disc ~1px
+     each side so it visually matches the lighter swatches (see isDarkHex in JS) */
+  .pc__swatch--dark > span {
+    width: calc(100% + 2px);
+    height: calc(100% + 2px);
+    margin: -1px;
+  }
   .catalog__controls {
     display: flex;
     align-items: center;
@@ -1978,7 +2003,10 @@
   /* ================================================================== */
   @media (min-width: 1024px) {
     body {
-      padding-bottom: 0; /* no sticky bar on desktop */
+      /* No bottom padding here — it would show as a white strip under the yellow
+         footer. The footer carries its own extra bottom padding instead so the
+         floating CTA sits over the footer's yellow wash, not a white gap. */
+      padding-bottom: 0;
     }
 
     /* nav */
@@ -2012,7 +2040,7 @@
     /* hero: two columns */
     .hero {
       display: grid;
-      grid-template-columns: minmax(400px, 471px) minmax(0, 1fr);
+      grid-template-columns: minmax(420px, 520px) minmax(0, 1fr);
       align-items: center;
       justify-content: space-between;
       column-gap: 64px;
@@ -2021,36 +2049,42 @@
       min-height: 640px;
     }
 
-    /* left column holds the text block + inline CTA, stacked */
+    /* left column holds the text block. The Book-your-Slot CTA that used to sit
+       here is now the site-wide sticky CTA, so extra vertical padding fills the
+       space it left and keeps the column balanced against the video. */
     .hero__content {
       grid-column: 1;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 56px;
+      justify-content: center;
+      gap: 32px;
+      padding-block: 48px;
     }
     .hero__text {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 28px;
+      gap: 32px;
       width: 100%;
     }
 
+    /* everything in the left column is scaled up ~15% now that the CTA is gone */
     .rating-badge {
-      gap: 8px;
+      gap: 9px;
+      padding: 9px 14px;
     }
     .rating-badge__stars svg {
-      width: 12px;
-      height: 12px;
+      width: 14px;
+      height: 14px;
     }
     .rating-badge__text {
-      font-size: 14px;
+      font-size: 16px;
     }
 
     .hero__title {
-      max-width: 471px;
-      font-size: 48px;
+      max-width: 520px;
+      font-size: 55px;
       line-height: 1.1;
     }
     .hero__title br {
@@ -2059,28 +2093,37 @@
 
     .features {
       justify-content: center;
-      gap: 16px;
+      gap: 18px;
     }
     .feature {
       flex: 0 0 auto;
-      width: 140px;
+      width: 160px;
+      gap: 12px;
     }
     .feature__icon {
-      width: 32px;
-      height: 32px;
+      width: 37px;
+      height: 37px;
     }
     .feature__label {
-      font-size: 16px;
-    }
-
-    .learn-more__text {
       font-size: 18px;
+      max-width: 140px;
     }
 
-    /* inline CTA appears, sits at bottom of left column */
+    .learn-more__icon {
+      width: 37px;
+      height: 37px;
+    }
+    .learn-more__icon svg {
+      width: 27px;
+      height: 27px;
+    }
+    .learn-more__text {
+      font-size: 21px;
+    }
+
+    /* inline CTA removed on desktop — the sticky CTA below replaces it */
     .cta-btn.cta-inline {
-      display: flex;
-      max-width: 439px;
+      display: none;
     }
 
     /* right column: the desk video, square + rounded */
@@ -2094,9 +2137,115 @@
       border-radius: 32px;
     }
 
-    /* hide sticky bar on desktop */
+    /* Desktop: the Book-your-Consultation CTA stays sticky site-wide, floating on
+       a progressive-glass panel. The panel itself is click-through; only the
+       button captures the pointer, so the rest of the page stays interactive. */
     .sticky-cta {
-      display: none;
+      display: block;
+      background: none;
+      border-top: 0;
+      padding: 0 clamp(32px, 6vw, 120px) 28px;
+      pointer-events: none;
+    }
+    /* Progressive blur (8-layer): each layer blurs twice as much as the one above
+       it and is revealed through a mask band shifted 12.5% lower, with adjacent
+       bands overlapping. Stacked, they ramp the blur smoothly from perfectly
+       sharp at the top to a soft frost at the bottom — no hard edge anywhere.
+       A faint white wash (densest at the bottom, gone before the top) keeps the
+       panel reading as a surface over the page. */
+    .sticky-cta__glass {
+      display: block;
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 209px; /* grows upward (bottom-anchored) so the fade starts higher */
+      isolation: isolate; /* contain the layers' stacking so the button stays on top */
+      pointer-events: none;
+      background: linear-gradient(
+        to top,
+        rgba(255, 255, 255, 0.55) 0%,
+        rgba(255, 255, 255, 0.34) 34%,
+        rgba(255, 255, 255, 0) 76%
+      );
+    }
+    .sticky-cta__glass > div {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+    .sticky-cta__glass > div:nth-child(1) {
+      backdrop-filter: blur(0.0546875px);
+      -webkit-backdrop-filter: blur(0.0546875px);
+      mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, #000 12.5%, #000 25%, rgba(0, 0, 0, 0) 37.5%);
+      -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, #000 12.5%, #000 25%, rgba(0, 0, 0, 0) 37.5%);
+    }
+    .sticky-cta__glass > div:nth-child(2) {
+      backdrop-filter: blur(0.109375px);
+      -webkit-backdrop-filter: blur(0.109375px);
+      mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0) 12.5%, #000 25%, #000 37.5%, rgba(0, 0, 0, 0) 50%);
+      -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0) 12.5%, #000 25%, #000 37.5%, rgba(0, 0, 0, 0) 50%);
+    }
+    .sticky-cta__glass > div:nth-child(3) {
+      backdrop-filter: blur(0.21875px);
+      -webkit-backdrop-filter: blur(0.21875px);
+      mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0) 25%, #000 37.5%, #000 50%, rgba(0, 0, 0, 0) 62.5%);
+      -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0) 25%, #000 37.5%, #000 50%, rgba(0, 0, 0, 0) 62.5%);
+    }
+    .sticky-cta__glass > div:nth-child(4) {
+      backdrop-filter: blur(0.4375px);
+      -webkit-backdrop-filter: blur(0.4375px);
+      mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0) 37.5%, #000 50%, #000 62.5%, rgba(0, 0, 0, 0) 75%);
+      -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0) 37.5%, #000 50%, #000 62.5%, rgba(0, 0, 0, 0) 75%);
+    }
+    .sticky-cta__glass > div:nth-child(5) {
+      backdrop-filter: blur(0.875px);
+      -webkit-backdrop-filter: blur(0.875px);
+      mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0) 50%, #000 62.5%, #000 75%, rgba(0, 0, 0, 0) 87.5%);
+      -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0) 50%, #000 62.5%, #000 75%, rgba(0, 0, 0, 0) 87.5%);
+    }
+    .sticky-cta__glass > div:nth-child(6) {
+      backdrop-filter: blur(1.75px);
+      -webkit-backdrop-filter: blur(1.75px);
+      mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0) 62.5%, #000 75%, #000 87.5%, rgba(0, 0, 0, 0) 100%);
+      -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0) 62.5%, #000 75%, #000 87.5%, rgba(0, 0, 0, 0) 100%);
+    }
+    .sticky-cta__glass > div:nth-child(7) {
+      backdrop-filter: blur(3.5px);
+      -webkit-backdrop-filter: blur(3.5px);
+      mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0) 75%, #000 87.5%, #000 100%);
+      -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0) 75%, #000 87.5%, #000 100%);
+    }
+    .sticky-cta__glass > div:nth-child(8) {
+      backdrop-filter: blur(7px);
+      -webkit-backdrop-filter: blur(7px);
+      mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0) 87.5%, #000 100%);
+      -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0) 87.5%, #000 100%);
+    }
+    /* button: +20% length, +10% height, +10% type (desktop sticky only) */
+    .sticky-cta .cta-btn {
+      position: relative;
+      z-index: 1;
+      max-width: 527px;
+      margin: 0 auto;
+      pointer-events: auto;
+    }
+    .sticky-cta .cta-btn__main {
+      height: 62px;
+    }
+    .sticky-cta .cta-btn__label {
+      font-size: 20px;
+    }
+    .sticky-cta .cta-btn__main svg {
+      width: 24px;
+      height: 24px;
+    }
+    .sticky-cta .cta-btn__arrow {
+      width: 62px;
+    }
+    .sticky-cta .cta-btn__arrow svg {
+      width: 24px;
+      height: 24px;
     }
   }
 
@@ -2254,46 +2403,39 @@
       line-height: 1.2;
     }
     .how__track {
-      flex-direction: row;
+      flex-direction: column;
       width: 100%;
-      gap: 12px;
-      overflow-x: auto;
-      scroll-snap-type: x mandatory;
-      scrollbar-width: none;
-    }
-    .how__track::-webkit-scrollbar {
-      display: none;
+      gap: 16px;
     }
     .how-card {
-      flex: 0 0 322px;
-      width: 322px;
-      min-height: 355px;
-      justify-content: flex-start;
+      flex-direction: row;
+      align-items: center;
       gap: 40px;
-      padding: 40px;
-      scroll-snap-align: start;
+      padding: 32px 40px;
+    }
+    .how-card__num {
+      width: 100px;
+      flex-shrink: 0;
+      font-size: 28px;
+    }
+    .how-card__body {
+      flex: 1;
+      flex-direction: row;
+      align-items: center;
+      gap: 20px;
     }
     .how-card__icon {
-      width: 44px;
-      height: 44px;
+      width: 60px;
+      height: 60px;
     }
     .how-card__text {
-      gap: 12px;
-    }
-    .how-card__step {
-      font-size: 18px;
+      gap: 10px;
     }
     .how-card__title {
       font-size: 24px;
     }
     .how-card__desc {
       font-size: 22px;
-    }
-    .how__controls {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 16px;
     }
   }
 
@@ -2871,7 +3013,9 @@
       position: relative;
       overflow: hidden;
       background: #f8f8f8;
-      padding: 60px clamp(40px, 6vw, 120px);
+      /* extra bottom padding gives the floating sticky CTA room over the yellow
+         wash (no white strip) while keeping the copyright row clear of it */
+      padding: 60px clamp(40px, 6vw, 120px) 150px;
     }
     .site-footer__wash {
       pointer-events: none;
@@ -2968,7 +3112,7 @@
 
         <!-- headline -->
         <h1 class="hero__title" id="heroTitle">
-          Upgrade your<br>Dream Setup with<br>Our <em>Ergonomic<br>Expertise</em>
+          Upgrade your<br> Dream Setup with<br> Our <em>Ergonomic <br>Expertise</em>
         </h1>
 
         <hr class="hero__divider" />
@@ -3037,7 +3181,7 @@
         loop
         playsinline
         preload="none"
-        data-src="https://cdn.shopify.com/videos/c/o/v/1da0280b45fe4ccb93fd28d37540f406.mp4"
+        data-src="https://cdn.shopify.com/videos/c/o/v/8c08947b3126499ba737e0a6ef150454.mp4"
         poster="data:image/jpeg;base64,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"
       ></video>
     </div>
@@ -3221,75 +3365,73 @@
     <div class="how__track" id="howTrack">
       <!-- Step 01 -->
       <article class="how-card">
-        <span class="how-card__icon">
+        <span class="how-card__num">01</span>
+        <div class="how-card__body">
+          <span class="how-card__icon">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" fill="none"><path d="M14.688 1.97925V5.31226H25.313V1.97925H28.021V5.31226H35.0005C35.7482 5.31243 36.354 5.91897 36.354 6.66675V33.3337C36.3538 34.0814 35.7481 34.6871 35.0005 34.6873H5.00049C4.25272 34.6873 3.64617 34.0815 3.646 33.3337V6.66675C3.646 5.91887 4.25261 5.31226 5.00049 5.31226H11.979V1.97925H14.688ZM6.354 31.9792H33.646V18.0212H6.354V31.9792ZM18.021 21.9792V28.0212H10.313V21.9792H18.021ZM6.354 15.3123H33.646V8.02124H28.021V11.3542H25.313V8.02124H14.688V11.3542H11.979V8.02124H6.354V15.3123Z" fill="url(#step1grad)" stroke="#F7F7F7" stroke-width="0.625"/><defs><linearGradient id="step1grad" x1="-3.99976" y1="-9.5" x2="26.0002" y2="29" gradientUnits="userSpaceOnUse"><stop stop-color="#FCD527"/><stop offset="1" stop-color="#307FE2"/></linearGradient></defs></svg>
         </span>
-        <div class="how-card__text">
-          <p class="how-card__step">Step 01</p>
-          <h3 class="how-card__title">Book a Consultation</h3>
-          <p class="how-card__desc">Choose a virtual session or schedule an in-home visit.</p>
+          <div class="how-card__text">
+            <h3 class="how-card__title">Book a Consultation</h3>
+            <p class="how-card__desc">Choose a virtual session or schedule an in-home visit.</p>
+          </div>
         </div>
       </article>
 
       <!-- Step 02 -->
       <article class="how-card">
-        <span class="how-card__icon">
+        <span class="how-card__num">02</span>
+        <div class="how-card__body">
+          <span class="how-card__icon">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" fill="none"><path d="M32.2251 28.4069L32.2827 28.524L32.4126 28.5436L37.3882 29.2653L33.7876 32.775L33.6938 32.8668L33.7163 32.9967L34.5659 37.9508L30.1157 35.6119L29.9995 35.5504L29.8833 35.6119L25.4331 37.9508L26.2837 32.9967L26.3062 32.8668L26.2114 32.775L22.6099 29.2653L27.5864 28.5436L27.7163 28.524L27.7749 28.4069L29.9995 23.8981L32.2251 28.4069ZM19.7495 26.4225C14.2874 26.5534 9.88714 30.9545 9.75635 36.4166H6.91943C7.05113 29.3895 12.7225 23.7174 19.7495 23.5856V26.4225ZM19.9995 1.91663C25.3864 1.91663 29.7495 6.2797 29.7495 11.6666C29.7495 17.0536 25.3864 21.4166 19.9995 21.4166C14.6127 21.4165 10.2495 17.0534 10.2495 11.6666C10.2495 6.27981 14.6127 1.9168 19.9995 1.91663ZM19.9995 4.74963C16.1783 4.74981 13.0835 7.84533 13.0835 11.6666C13.0835 15.4879 16.1783 18.5834 19.9995 18.5836C23.8209 18.5836 26.9165 15.488 26.9165 11.6666C26.9165 7.84522 23.8209 4.74963 19.9995 4.74963Z" fill="url(#step2grad)" stroke="white" stroke-width="0.5"/><defs><linearGradient id="step2grad" x1="-0.210364" y1="-10.642" x2="33.7604" y2="26.448" gradientUnits="userSpaceOnUse"><stop stop-color="#FCD527"/><stop offset="1" stop-color="#307FE2"/></linearGradient></defs></svg>
         </span>
-        <div class="how-card__text">
-          <p class="how-card__step">Step 02</p>
-          <h3 class="how-card__title">Get Expert Assessed</h3>
-          <p class="how-card__desc">An ergonomic advisor evaluates your needs, habits and posture.</p>
+          <div class="how-card__text">
+            <h3 class="how-card__title">Get Expert Assessed</h3>
+            <p class="how-card__desc">An ergonomic advisor evaluates your needs, habits and posture.</p>
+          </div>
         </div>
       </article>
 
       <!-- Step 03 -->
       <article class="how-card">
-        <span class="how-card__icon">
+        <span class="how-card__num">03</span>
+        <div class="how-card__body">
+          <span class="how-card__icon">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" fill="none"><path d="M6.66406 3.646H26.5371L34.6865 11.7954L34.6875 34.9878C34.6874 35.7465 34.082 36.3538 33.3447 36.354H6.65527C5.91558 36.3538 5.31268 35.7373 5.3125 35.0142V4.98682C5.3125 4.24859 5.91627 3.64605 6.66406 3.646ZM8.02051 33.646H31.9795V13.021H25.3125V6.354H8.02051V33.646ZM28.0205 18.646V28.021H25.3125V18.646H28.0205ZM21.3545 11.979V28.021H18.6455V11.979H21.3545ZM14.6875 21.979V28.021H11.9795V21.979H14.6875Z" fill="url(#step3grad)" stroke="white" stroke-width="0.625"/><defs><linearGradient id="step3grad" x1="-1.59993" y1="-7.83325" x2="29.0199" y2="27.5327" gradientUnits="userSpaceOnUse"><stop stop-color="#FCD527"/><stop offset="1" stop-color="#307FE2"/></linearGradient></defs></svg>
         </span>
-        <div class="how-card__text">
-          <p class="how-card__step">Step 03</p>
-          <h3 class="how-card__title">Receive Your Report</h3>
-          <p class="how-card__desc">Personalised product recommendation and fixes.</p>
+          <div class="how-card__text">
+            <h3 class="how-card__title">Receive Your Recommendation</h3>
+            <p class="how-card__desc">Personalised product recommendation and fixes.</p>
+          </div>
         </div>
       </article>
 
       <!-- Step 04 -->
       <article class="how-card">
-        <span class="how-card__icon">
+        <span class="how-card__num">04</span>
+        <div class="how-card__body">
+          <span class="how-card__icon">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" fill="none"><path d="M10.0083 31.9163C11.711 31.9164 13.0913 33.2974 13.0913 35.0002C13.0911 36.7029 11.7109 38.0831 10.0083 38.0833C8.30553 38.0833 6.92449 36.703 6.92432 35.0002C6.92432 33.2973 8.30542 31.9163 10.0083 31.9163ZM30.0083 31.9163C31.7111 31.9164 33.0913 33.2974 33.0913 35.0002C33.0911 36.7029 31.711 38.0831 30.0083 38.0833C28.3055 38.0833 26.9245 36.703 26.9243 35.0002C26.9243 33.2973 28.3054 31.9163 30.0083 31.9163ZM8.34131 3.58325C9.12372 3.58325 9.7583 4.21785 9.7583 5.00024V25.2502H30.9341L30.981 25.0608L34.3149 11.7268L34.3921 11.4163H13.5913V8.58325H36.2065C36.989 8.58325 37.6235 9.21785 37.6235 10.0002C37.6235 10.116 37.6087 10.231 37.5806 10.343V10.344L33.4146 27.01C33.257 27.6407 32.6897 28.0833 32.0396 28.0833H8.34131C7.55891 28.0833 6.92432 27.4487 6.92432 26.6663V6.41626H3.59131V3.58325H8.34131Z" fill="url(#step4grad)" stroke="white" stroke-width="0.5"/><defs><linearGradient id="step4grad" x1="-4.25565" y1="-8.39183" x2="27.3455" y2="31.6207" gradientUnits="userSpaceOnUse"><stop stop-color="#FCD527"/><stop offset="1" stop-color="#307FE2"/></linearGradient></defs></svg>
         </span>
-        <div class="how-card__text">
-          <p class="how-card__step">Step 04</p>
-          <h3 class="how-card__title">Assisted Product Purchase</h3>
-          <p class="how-card__desc">Visit the store or purchase online assisted by a Frido expert.</p>
+          <div class="how-card__text">
+            <h3 class="how-card__title">Assisted Product Purchase</h3>
+            <p class="how-card__desc">Visit the store or purchase online assisted by a Frido expert.</p>
+          </div>
         </div>
       </article>
 
       <!-- Step 05 -->
       <article class="how-card">
-        <span class="how-card__icon">
+        <span class="how-card__num">05</span>
+        <div class="how-card__body">
+          <span class="how-card__icon">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" fill="none"><path d="M3.3335 8.58325H26.6665C27.4489 8.58325 28.0835 9.21785 28.0835 10.0002V13.5833H33.2075L38.0835 20.175V29.7502H34.7241L34.6929 29.9641C34.3057 32.6696 31.979 34.7502 29.1665 34.7502C26.354 34.7502 24.0273 32.6696 23.6401 29.9641L23.6089 29.7502H14.7241L14.6929 29.9641C14.3059 32.6696 11.9791 34.7502 9.1665 34.7502C6.35393 34.7502 4.02714 32.6696 3.64014 29.9641L3.60889 29.7502H1.9165V10.0002C1.9165 9.21785 2.5511 8.58325 3.3335 8.58325ZM9.1665 26.4163C7.64782 26.4163 6.41668 27.6477 6.4165 29.1663C6.4165 29.4872 6.47133 29.7962 6.57275 30.0833C6.95015 31.151 7.96875 31.9163 9.1665 31.9163C10.3643 31.9163 11.3829 31.151 11.7603 30.0833C11.8617 29.7962 11.9165 29.4872 11.9165 29.1663C11.9163 27.6477 10.6852 26.4163 9.1665 26.4163ZM29.1665 26.4163C27.6479 26.4163 26.4167 27.6477 26.4165 29.1663C26.4165 29.4071 26.447 29.6415 26.5054 29.8645L26.5728 30.0833C26.9501 31.151 27.9688 31.9163 29.1665 31.9163C30.2895 31.9163 31.255 31.2436 31.6821 30.2795L31.7603 30.0833C31.8617 29.7962 31.9165 29.4872 31.9165 29.1663C31.9163 27.6477 30.6851 26.4163 29.1665 26.4163ZM4.74951 25.6965L5.17822 25.259C6.1919 24.2245 7.60417 23.5833 9.1665 23.5833C11.3933 23.5833 13.316 24.8869 14.2124 26.7737L14.2808 26.9163H24.0522L24.1206 26.7737C24.3881 26.2108 24.7468 25.6992 25.1782 25.259L25.2495 25.1858V11.4163H4.74951V25.6965ZM35.2495 21.1096L35.2007 21.0432L31.854 16.5178L31.7788 16.4163H28.0835V21.9163H35.2495V21.1096Z" fill="url(#step5grad)" stroke="white" stroke-width="0.5"/><defs><linearGradient id="step5grad" x1="-6.40007" y1="-0.600147" x2="14.8334" y2="36.868" gradientUnits="userSpaceOnUse"><stop stop-color="#FCD527"/><stop offset="1" stop-color="#307FE2"/></linearGradient></defs></svg>
         </span>
-        <div class="how-card__text">
-          <p class="how-card__step">Step 05</p>
-          <h3 class="how-card__title">Set Up &amp; Get Going</h3>
-          <p class="how-card__desc">Free delivery and installation, for your ergonomic workspace.</p>
+          <div class="how-card__text">
+            <h3 class="how-card__title">Set Up &amp; Get Going</h3>
+            <p class="how-card__desc">Free delivery and installation, for your ergonomic workspace.</p>
+          </div>
         </div>
       </article>
-    </div>
-
-    <div class="how__controls">
-      <span class="dots"></span>
-      <span class="carousel-arrows">
-        <button type="button" data-dir="prev" aria-label="Previous steps">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg>
-        </button>
-        <button type="button" data-dir="next" aria-label="Next steps">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
-        </button>
-      </span>
     </div>
   </section>
 
@@ -3301,7 +3443,7 @@
     </div>
 
     <div class="wc__track" id="wcTrack">
-      <img class="wc__card" src="https://cdn.shopify.com/s/files/1/0553/0419/2034/files/ergonomic_assistance_Card_A.png?v=1783354182" alt="35 Ls+ Customers trust Frido with Comfort & Ergonomics" loading="lazy" decoding="async" />
+      <img class="wc__card" src="https://cdn.shopify.com/s/files/1/0553/0419/2034/files/ergo_assis_card_A.png?v=1783589907" alt="35 Ls+ Customers trust Frido with Comfort & Ergonomics" loading="lazy" decoding="async" />
       <img class="wc__card" src="https://cdn.shopify.com/s/files/1/0553/0419/2034/files/ergonomic_assistance_Card_B.png?v=1783354183" alt="Leading Ergonomic products across various categories" loading="lazy" decoding="async" />
       <img class="wc__card" src="https://cdn.shopify.com/s/files/1/0553/0419/2034/files/ergonomic_assistance_Card_C.png?v=1783354182" alt="18+ Experience Stores across 5 cities and expanding" loading="lazy" decoding="async" />
       <img class="wc__card" src="https://cdn.shopify.com/s/files/1/0553/0419/2034/files/ergonomic_assistance_Card_D.png?v=1783354173" alt="60,000+ Ergonomic spaces upgraded for better comfort" loading="lazy" decoding="async" />
@@ -3444,7 +3586,7 @@
     </div>
 
     <div class="faq__list">
-      <details class="faq__item" open>
+      <details class="faq__item">
         <summary class="faq__q">
           <span>What is the Frido Ergonomic Assessment Service?</span>
           <svg class="faq__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
@@ -3452,13 +3594,13 @@
         <p class="faq__a">It's a personalised workspace evaluation done by a certified ergonomic advisor. You get a detailed report with product recommendations, posture fixes, and setup changes built around your body and work habits.</p>
       </details>
 
-      <details class="faq__item">
+      <!-- <details class="faq__item">
         <summary class="faq__q">
           <span>Is the assessment free?</span>
           <svg class="faq__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
         </summary>
         <p class="faq__a">The basic consultation is free. A detailed report with full recommendations may be chargeable — but if you purchase products from your report, the consultation fee gets redeemed.</p>
-      </details>
+      </details> -->
 
       <details class="faq__item">
         <summary class="faq__q">
@@ -3476,13 +3618,13 @@
         <p class="faq__a">A trained physiotherapist with expertise in ergonomics — not a salesperson. Someone who understands your body, not just the products.</p>
       </details>
 
-      <details class="faq__item">
+      <!-- <details class="faq__item">
         <summary class="faq__q">
           <span>What does the report include?</span>
           <svg class="faq__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
         </summary>
         <p class="faq__a">Your report covers recommended products, posture corrections, workstation adjustments, and exercises — all specific to your setup and body.</p>
-      </details>
+      </details> -->
 
       <details class="faq__item">
         <summary class="faq__q">
@@ -3622,6 +3764,10 @@
 
 <!-- ===================== STICKY CTA (mobile) ===================== -->
 <div class="sticky-cta" id="stickyCta">
+  <!-- desktop-only progressive-glass panel behind the button (display:none on mobile) -->
+  <div class="sticky-cta__glass" aria-hidden="true">
+    <div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div>
+  </div>
   <a class="cta-btn" href="https://link.myfrido.com/4f8c09" target="_blank" rel="noopener" data-cta="book-consultation">
     <span class="cta-btn__main">
       <svg viewBox="0 0 24 24" fill="none" stroke="#131313" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2.5"/><path d="M3 9.5h18M8 3v4M16 3v4"/></svg>
@@ -3701,8 +3847,8 @@
         <div class="why-card__img">
           <img src="https://cdn.shopify.com/s/files/1/0553/0419/2034/files/ergo-assis_why_you_need_it_img2.png?v=1783434432" alt="Comfortable ergonomic setup" loading="lazy" decoding="async" />
         </div>
-        <p class="why-card__lead"><b>Our Ergonomic Advisor,</b> assesses your setup, understands your needs and recommends what truly makes a difference.</p>
-        <p class="why-card__sub">This will bring changes such as,</p>
+        <p class="why-card__lead"><b>Our Ergonomic Advisor,</b> assesses your setup, understands your needs and recommends what truly makes a difference. <span class="why-card__sub"> This will bring changes such as,</span></p>
+        <!-- <p class="why-card__sub">This will bring changes such as,</p> -->
         <div class="why-card__stats">
           <div class="stat">
             <span class="stat__ic"><svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40" fill="none">
@@ -4067,7 +4213,6 @@
     whenIdle(function () {
       [
         ["testiTrack", ".testimonials__controls"],
-        ["howTrack", ".how__controls"],
         ["wcTrack", ".wc__controls"]
       ].forEach(function (cfg) {
         setupCarousel(document.getElementById(cfg[0]), document.querySelector(cfg[1]));
@@ -4365,48 +4510,7 @@
               { name: "Brown", hex: "#7a5334", img: "https://cdn.shopify.com/s/files/1/0553/0419/2034/files/Frido_Portable_Standing_Desk_Brown.png?v=1783421913" }
             ]
           },
-          { name: "Frido Standing Desk Converter", color: "Black", hex: "#1c1c1c", tags: ["Easy Fix", "Compact"], img: "https://cdn.shopify.com/s/files/1/0553/0419/2034/files/Standing_Desk_Converter_ed00a102-24c6-40bb-ac23-10b61188ee03.png?v=1783422218" },
-          {
-            name: "Frido Ultimate Lap Desk Pillow",
-            color: "Blue",
-            hex: "#43608e",
-            tags: ["Couch-Friendly", "Compact"],
-            img: "https://cdn.shopify.com/s/files/1/0553/0419/2034/files/Frido_Ultimate_Lap_Desk_Pillow_Default.png?v=1783423053",
-            variants: [
-              {
-                name: "Blue", hex: "#43608e",
-                img: "https://cdn.shopify.com/s/files/1/0553/0419/2034/files/Frido_Ultimate_Lap_Desk_Pillow_Default.png?v=1783423053",
-                imgs: [
-                  "https://cdn.shopify.com/s/files/1/0553/0419/2034/files/Frido_Ultimate_Lap_Desk_Pillow_Default.png?v=1783423053",
-                  "https://cdn.shopify.com/s/files/1/0553/0419/2034/files/Frido_Ultimate_Lap_Desk_Pillow_Blue.png?v=1783423068",
-                  "https://cdn.shopify.com/s/files/1/0553/0419/2034/files/Frido_Ultimate_Lap_Desk_Pillow_Blue-1.png?v=1783423069",
-                  "https://cdn.shopify.com/s/files/1/0553/0419/2034/files/Frido_Ultimate_Lap_Desk_Pillow_Blue-3.png?v=1783423072",
-                  "https://cdn.shopify.com/s/files/1/0553/0419/2034/files/Frido_Ultimate_Lap_Desk_Pillow_Blue-2.png?v=1783423074"
-                ]
-              },
-              {
-                name: "Black", hex: "#1c1c1c",
-                img: "https://cdn.shopify.com/s/files/1/0553/0419/2034/files/Frido_Ultimate_Lap_Desk_Pillow_Default-1.png?v=1783423181",
-                imgs: [
-                  "https://cdn.shopify.com/s/files/1/0553/0419/2034/files/Frido_Ultimate_Lap_Desk_Pillow_Default-1.png?v=1783423181",
-                  "https://cdn.shopify.com/s/files/1/0553/0419/2034/files/Frido_Ultimate_Lap_Desk_Pillow_Black.png?v=1783423172",
-                  "https://cdn.shopify.com/s/files/1/0553/0419/2034/files/Frido_Ultimate_Lap_Desk_Pillow_Black-1.png?v=1783423175",
-                  "https://cdn.shopify.com/s/files/1/0553/0419/2034/files/Frido_Ultimate_Lap_Desk_Pillow_Black-2.png?v=1783423182"
-                ]
-              },
-              {
-                name: "Grey", hex: "#8d8d8d",
-                img: "https://cdn.shopify.com/s/files/1/0553/0419/2034/files/Frido_Ultimate_Lap_Desk_Pillow_Default_24e6f496-9fbe-4700-8bab-c1fa47f5ec2d.png?v=1783423182",
-                imgs: [
-                  "https://cdn.shopify.com/s/files/1/0553/0419/2034/files/Frido_Ultimate_Lap_Desk_Pillow_Default_24e6f496-9fbe-4700-8bab-c1fa47f5ec2d.png?v=1783423182",
-                  "https://cdn.shopify.com/s/files/1/0553/0419/2034/files/Frido_Ultimate_Lap_Desk_Pillow_Grey.png?v=1783423174",
-                  "https://cdn.shopify.com/s/files/1/0553/0419/2034/files/Frido_Ultimate_Lap_Desk_Pillow_Grey-1.png?v=1783423177",
-                  "https://cdn.shopify.com/s/files/1/0553/0419/2034/files/Frido_Ultimate_Lap_Desk_Pillow_Grey-3.png?v=1783423183",
-                  "https://cdn.shopify.com/s/files/1/0553/0419/2034/files/Frido_Ultimate_Lap_Desk_Pillow_Grey-2.png?v=1783423185"
-                ]
-              }
-            ]
-          }
+          { name: "Frido Standing Desk Converter", color: "Black", hex: "#1c1c1c", tags: ["Easy Fix", "Compact"], img: "https://cdn.shopify.com/s/files/1/0553/0419/2034/files/Standing_Desk_Converter_ed00a102-24c6-40bb-ac23-10b61188ee03.png?v=1783422218" }
         ]
       },
       {
@@ -4662,6 +4766,19 @@
         : [{ name: p.color || "Black", hex: p.hex, img: p.img || null }];
     }
 
+    /* A dark disc on a light ground reads ~1px smaller than a light one of the
+       same size (irradiation illusion). Flag dark swatches so CSS can nudge them
+       up a hair and keep every swatch visually the same size. */
+    function isDarkHex(hex) {
+      var c = String(hex || "").replace("#", "");
+      if (c.length === 3) c = c[0] + c[0] + c[1] + c[1] + c[2] + c[2];
+      if (c.length < 6) return false;
+      var r = parseInt(c.slice(0, 2), 16),
+          g = parseInt(c.slice(2, 4), 16),
+          b = parseInt(c.slice(4, 6), 16);
+      return (0.299 * r + 0.587 * g + 0.114 * b) < 80; // perceived luminance
+    }
+
     /* ---- Per-product review counts (product cards + PDP rating) ----
        number > 0 → "(N +)";  0/unknown → hide;  "new" → "Newly Launched".
        Keyed by a normalised name so dashes/parens/spaces don't matter. */
@@ -4682,7 +4799,6 @@
       "Frido ErgoLuxe Electric Standing Desk": "new",
       "Frido Portable Standing Desk": 17,
       "Frido Standing Desk Converter": "new",
-      "Frido Ultimate Lap Desk Pillow": 215,
       "Frido ErgoLuxe Monitor Arm - Single": "new",
       "Frido ErgoLuxe Monitor Arm - Dual": "new",
       "Frido Mouse Wrist Support": 0,
@@ -4729,6 +4845,7 @@
       }).join("");
       var swatches = variantsOf(p).map(function (v, vi) {
         return '<span class="pc__swatch' + (vi === 0 ? " is-active" : "") +
+            (isDarkHex(v.hex) ? " pc__swatch--dark" : "") +
             '" data-vi="' + vi + '" title="' + esc(v.name) + '">' +
             '<span style="background:' + v.hex + '"></span></span>';
       }).join("");
@@ -4800,7 +4917,6 @@
        each row names the product it plays.
        ================================================================ */
     var REVIEWS = [
-      { video: "https://cdn.shopify.com/videos/c/o/v/8e2a04cf02ca418e8113f6c079682f89.mp4", cat: "desks", i: 3 },        // Ultimate Lap Desk Pillow
       { video: "https://cdn.shopify.com/videos/c/o/v/33d7ed02b370477e8f34d725403a97e8.mp4", cat: "chairs", i: 2 },       // Vajra Gaming Chair
       { video: "https://cdn.shopify.com/videos/c/o/v/5eb4267e08b148edbc186163bebc251a.mp4", cat: "accessories", i: 2 },  // Mouse Wrist Support
       { video: "https://cdn.shopify.com/videos/c/o/v/5616eb171c184911818c62b27fde9663.mp4", cat: "accessories", i: 3 },  // Orthotics Posture Corrector
