@@ -2228,6 +2228,7 @@
      
        .pc__swatches {
          display: flex;
+         flex-wrap: wrap;
          gap: 6px;
        }
      
@@ -2595,6 +2596,7 @@
      
        .pdp__swatches {
          display: flex;
+         flex-wrap: wrap;
          gap: 4px;
        }
      
@@ -6322,19 +6324,15 @@
              items: [
                {
                  name: "Frido Cloud Backrest Cushion",
-                 color: "Clay Brown",
-                 hex: "#b87a5b",
+                 color: "Pebble Grey",
+                 hex: "#8d8d8d",
                  tags: [],
-                 img: "https://cdn.shopify.com/s/files/1/0553/0419/2034/files/Cloud_Backrest_Cushion-1.png?v=1783422464",
+                 img: "https://cdn.shopify.com/s/files/1/0553/0419/2034/files/CB-WithoutShadow-Grey_5345cec7-0330-4710-b27a-fc8e73aba864.png?v=1745655009&width=388",
                  variants: [
-                   {
-                     name: "Clay Brown", hex: "#b87a5b",
-                     img: "https://cdn.shopify.com/s/files/1/0553/0419/2034/files/Cloud_Backrest_Cushion-1.png?v=1783422464",
-                     imgs: [
-                       "https://cdn.shopify.com/s/files/1/0553/0419/2034/files/Cloud_Backrest_Cushion-1.png?v=1783422464",
-                       "https://cdn.shopify.com/s/files/1/0553/0419/2034/files/Cloud_Backrest_Cushion-2.png?v=1783422466"
-                     ]
-                   }
+                   { name: "Pebble Grey", hex: "#8d8d8d", img: "https://cdn.shopify.com/s/files/1/0553/0419/2034/files/CB-WithoutShadow-Grey_5345cec7-0330-4710-b27a-fc8e73aba864.png?v=1745655009&width=388" },
+                   { name: "Lilly Pad", hex: "#7ea56b", img: "https://cdn.shopify.com/s/files/1/0553/0419/2034/files/CB-WithoutShadow-Green_92efc67b-da3e-469e-aeac-d06ff6b957ba.png?v=1745655033&width=388" },
+                   { name: "Barbie Pink", hex: "#e0218a", img: "https://cdn.shopify.com/s/files/1/0553/0419/2034/files/CB-WithoutShadow-Magenta_ad615340-124c-4085-bead-05f3251d634a.png?v=1745655017&width=388" },
+                   { name: "Black", hex: "#1c1c1c", img: "https://cdn.shopify.com/s/files/1/0553/0419/2034/files/CB-WithoutShadow-Black_6bd0059d-eeb7-475c-8a74-698fd94fdeca.png?v=1745655025&width=388" }
                  ]
                },
                {
@@ -6385,66 +6383,45 @@
                        "https://cdn.shopify.com/s/files/1/0553/0419/2034/files/Coccyx_Cushion_Black_Default.png?v=1783423888",
                        "https://cdn.shopify.com/s/files/1/0553/0419/2034/files/Coccyx_Cushion_Black.png?v=1783423886"
                      ]
-                   }
-                 ]
-               },
-               {
-                 name: "Frido XL Coccyx Cushion",
-                 color: "Red",
-                 hex: "#b8352f",
-                 tags: [],
-                 img: "https://cdn.shopify.com/s/files/1/0553/0419/2034/files/Coccyx_Cushion_Red_Default.png?v=1783423891",
-                 variants: [
-                   {
-                     name: "Red", hex: "#b8352f",
-                     img: "https://cdn.shopify.com/s/files/1/0553/0419/2034/files/Coccyx_Cushion_Red_Default.png?v=1783423891",
-                     imgs: [
-                       "https://cdn.shopify.com/s/files/1/0553/0419/2034/files/Coccyx_Cushion_Red_Default.png?v=1783423891",
-                       "https://cdn.shopify.com/s/files/1/0553/0419/2034/files/Coccyx_Cushion_Red.png?v=1783423887"
-                     ]
-                   }
+                   },
+                   { name: "Grey", hex: "#8d8d8d", img: "https://cdn.shopify.com/s/files/1/0553/0419/2034/files/Grey_2_3f7b446e-5250-41f1-8fdd-d557ab135590.png?v=1778498389&width=388" },
+                   { name: "Red Wine", hex: "#7b2e3b", img: "https://cdn.shopify.com/s/files/1/0553/0419/2034/files/Crimson_2.png?v=1778498389&width=388" }
                  ]
                },
                {
                  name: "Frido Ultimate Wedge Plus Cushion",
-                 color: "White-Black",
-                 hex: "#2a2a2a",
+                 color: "White",
                  tags: [],
-                 img: "https://cdn.shopify.com/s/files/1/0553/0419/2034/files/Frido_Ultimate_Wedge_Plus_Cushion_Default.png?v=1783424725",
+                 img: "https://cdn.shopify.com/s/files/1/0553/0419/2034/files/9_8a13d5a2-20a8-48d8-978e-f07c839181d8.png?v=1782814076",
+                 // Card swatch is a colour dot (hex derived from the colour name); the
+                 // PDP swatch still uses the product photo below.
                  variants: [
-                   {
-                     name: "White-Black", hex: "#2a2a2a",
-                     img: "https://cdn.shopify.com/s/files/1/0553/0419/2034/files/Frido_Ultimate_Wedge_Plus_Cushion_Default.png?v=1783424725",
-                     imgs: [
-                       "https://cdn.shopify.com/s/files/1/0553/0419/2034/files/Frido_Ultimate_Wedge_Plus_Cushion_Default.png?v=1783424725",
-                       "https://cdn.shopify.com/s/files/1/0553/0419/2034/files/Frido_Ultimate_Wedge_Plus_Cushion_1.png?v=1783424731"
-                     ]
-                   },
-                   {
-                     name: "White-Blue", hex: "#43608e",
-                     img: "https://cdn.shopify.com/s/files/1/0553/0419/2034/files/Frido_Ultimate_Wedge_Plus_Cushion_white-blue_Default.png?v=1783424730",
-                     imgs: [
-                       "https://cdn.shopify.com/s/files/1/0553/0419/2034/files/Frido_Ultimate_Wedge_Plus_Cushion_white-blue_Default.png?v=1783424730",
-                       "https://cdn.shopify.com/s/files/1/0553/0419/2034/files/Frido_Ultimate_Wedge_Plus_Cushion_white-blue.png?v=1783424733"
-                     ]
-                   }
+                   { name: "Cooling Cover", hex: "#bcd4de", img: "https://cdn.shopify.com/s/files/1/0553/0419/2034/files/1_1434f952-3914-423b-abcc-6a3ce2c3162b.png?v=1782814154" },  
+                   { name: "White", hex: "#f2f2f2", img: "https://cdn.shopify.com/s/files/1/0553/0419/2034/files/9_8a13d5a2-20a8-48d8-978e-f07c839181d8.png?v=1782814076" },
+                   { name: "White Grey", hex: "#d6d6d6", img: "https://cdn.shopify.com/s/files/1/0553/0419/2034/files/10_1124ccd2-e4ca-42ed-b988-d3f78422bb3b.png?v=1782814085" },
+                   { name: "Black", hex: "#1c1c1c", img: "https://cdn.shopify.com/s/files/1/0553/0419/2034/files/11_24fef89c-88aa-4a3e-a5f7-d438628e3cbc.png?v=1782814092" },
+                   { name: "Teal Blue", hex: "#2b8a9e", img: "https://cdn.shopify.com/s/files/1/0553/0419/2034/files/2_00f49859-e244-46e7-a2bc-e3b8bfc4b088.png?v=1782814147" },
+                   { name: "Blush Pink", hex: "#e7a5b4", img: "https://cdn.shopify.com/s/files/1/0553/0419/2034/files/4_140a435f-8da2-401f-95ba-aa91008b11b9.png?v=1782814138" },
+                   { name: "Slate Grey", hex: "#6f7a86", img: "https://cdn.shopify.com/s/files/1/0553/0419/2034/files/8_6d172ce6-bcad-476c-9914-a6accc632431.png?v=1782814123" },
+                   { name: "Coffee Brown", hex: "#6f4e37", img: "https://cdn.shopify.com/s/files/1/0553/0419/2034/files/3_af13fe8d-fcd3-457e-9801-787ac333a4e2.png?v=1782814116" },
+                   { name: "Sage Green", hex: "#9caf88", img: "https://cdn.shopify.com/s/files/1/0553/0419/2034/files/7_eb2255f4-d4da-4ad5-af34-f174a3cc227f.png?v=1782814131" },
+                   { name: "Mustard Yellow", hex: "#d9a441", img: "https://cdn.shopify.com/s/files/1/0553/0419/2034/files/6_1b0154c8-4b8d-4a72-9af7-f12e7bf8e7a1.png?v=1782814108" },
+                   { name: "Light Caramel", hex: "#d2a679", img: "https://cdn.shopify.com/s/files/1/0553/0419/2034/files/5_5bc8456f-9d77-46f2-af09-cee9f32b10b2.png?v=1782814100" }
                  ]
                },
                {
                  name: "Frido Cloud Seating Combo",
-                 color: "Blue-Grey",
-                 hex: "#8b93a3",
+                 color: "Pebble Grey",
+                 hex: "#8d8d8d",
                  tags: [],
-                 img: "https://cdn.shopify.com/s/files/1/0553/0419/2034/files/image_2_1db0a458-2ebc-43a8-bf76-bc5da3eda235.png?v=1783425724",
+                 img: "https://cdn.shopify.com/s/files/1/0553/0419/2034/files/Color_4_8a731218-454a-4be4-bbea-2f2815edc3cf.png?v=1750407948",
+                 // Card swatch is a colour dot (hex from the name); PDP swatch uses the photo.
                  variants: [
-                   {
-                     name: "Blue-Grey", hex: "#8b93a3",
-                     img: "https://cdn.shopify.com/s/files/1/0553/0419/2034/files/image_2_1db0a458-2ebc-43a8-bf76-bc5da3eda235.png?v=1783425724",
-                     imgs: [
-                       "https://cdn.shopify.com/s/files/1/0553/0419/2034/files/image_2_1db0a458-2ebc-43a8-bf76-bc5da3eda235.png?v=1783425724",
-                       "https://cdn.shopify.com/s/files/1/0553/0419/2034/files/image_3_f3b268c0-29b4-4fd7-91b7-764926956c51.png?v=1783425724"
-                     ]
-                   }
+                   { name: "Pebble Grey", hex: "#8d8d8d", img: "https://cdn.shopify.com/s/files/1/0553/0419/2034/files/Color_4_8a731218-454a-4be4-bbea-2f2815edc3cf.png?v=1750407948" },
+                   { name: "Mocha Brown", hex: "#7b5e48", img: "https://cdn.shopify.com/s/files/1/0553/0419/2034/files/Color_5_344afab3-a59e-4417-b41d-8aa396b0ace9.png?v=1750407949" },
+                   { name: "Lilly Pad", hex: "#a9b6b6", img: "https://cdn.shopify.com/s/files/1/0553/0419/2034/files/Color_3_59773fe9-6068-488a-a22d-52608b8e09d1.png?v=1750407949" },
+                   { name: "Black", hex: "#1c1c1c", img: "https://cdn.shopify.com/s/files/1/0553/0419/2034/files/Color_1_21e236ea-7065-4a4e-981b-2c53ba5cd0ee.png?v=1750407948" },
+                   { name: "Barbie Pink", hex: "#e0218a", img: "https://cdn.shopify.com/s/files/1/0553/0419/2034/files/Color_2_db21b495-9064-46de-a3e4-6d952ab55601.png?v=1750407948" }
                  ]
                },
                {
@@ -6558,7 +6535,6 @@
            "Frido Ultimate Pro Seat Cushion": 675,
            "Frido Ultimate Pro Posture Corrector Cushion": 569,
            "Frido Slim Coccyx Cushion": "new",
-           "Frido XL Coccyx Cushion": "new",
            "Frido Ultimate Wedge Plus Cushion": 1500,
            "Frido Cloud Seating Combo": 0,
            "Frido Ultimate Pro Seating Combo": 569
